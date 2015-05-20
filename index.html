@@ -55,8 +55,16 @@
     <script>
     // DOM ready
     $(function () {
+
       // Game model
       var Game = Backbone.Model.extend({
+
+        // Validates all the model attrs and
+        // return the invalid ones as
+        // object.
+        //
+        // The object key is the same as
+        // div id.
         validate: function (attrs, options) {
           var errors = {};
 
@@ -80,6 +88,7 @@
         }
       });
 
+      // App view
       var View = Backbone.View.extend({
         el: 'body',
 
@@ -106,6 +115,7 @@
 
           var _this = this;
 
+          // Set the model attributes
           this.model.set({
             title: this.$title.val(),
             appLink: this.$appLink.val(),
@@ -120,6 +130,8 @@
 
           // Validate the model
           if (!this.model.isValid()) {
+
+            // Display errors
             var errors = this.model.validationError;
             _.each(errors, function (message, key) {
               _this.$('#error-' + key).text(message);
@@ -134,9 +146,9 @@
         }
       });
 
+      // Initialization
       var game = new Game();
       new View({model: game});
-
     });
     </script>
   </body>
