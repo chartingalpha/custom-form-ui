@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Custom Form With Validation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified jQuery -->
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <!-- Underscore 1.8.3 -->
+    <script src="js/underscore.js"></script>
+    <!-- Backbone 1.2.0 -->
+    <script src="js/backbone.js"></script>
+    <!-- Custom css -->
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <form class="form" role="form">
+        <legend>Game Submission</legend>
+        <div class="form-group">
+          <label for="title" class="control-label">Game title</label>
+          <input type="text" id="title" placeholder="Game title" class="form-control">
+          <span class="helper-block helper-block-error" id="error-title"></span>
+        </div>
+        <div class="form-group">
+          <label for="appLink" class="control-label">App Link</label>
+          <input type="url" id="appLink" placeholder="Link to the app store" class="form-control">
+          <span class="helper-block helper-block-error" id="error-appLink"></span>
+        </div>
+        <div class="form-group">
+          <label for="category" class="control-label">Game category</label>
+          <select id="category" class="form-control">
+            <option value="0">Select category</option>
+            <option value="action">Action</option>
+            <option value="role-playing">Role Playing</option>
+            <option value="Strategy">Strategy</option>
+            <option value="Card Battle">Card Battle</option>
+            <option value="Sports">Sports</option>
+          </select>
+          <span class="helper-block helper-block-error" id="error-category"></span>
+        </div>
+        <div class="form-group">
+          <label for="editorial" class="control-label">Editoral</label>
+          <textarea id="editorial" cols="5" class="form-control"></textarea>
+          <span class="helper-block helper-block-error" id="error-editorial"></span>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Submit" class="btn btn-primary">
+        </div>
+      </form>
+    </div>
+    <script>
+    // DOM ready
+    $(function () {
+      // Game model
+      var Game = Backbone.Model.extend({
+        validate: function (attrs, options) {
+          var errors = {};
+
+          if (attrs.category === "0") {
+            errors['category'] = 'Please select a category for the game.';
+          }
+
+          if (!attrs.title.length > 0) {
+            errors['title'] = 'Please enter a title for the game.';
+          }
+
+          if (!attrs.appLink.length > 0) {
+            errors['appLink'] = 'Please include the link to the app store';
+          }
+
+          if (attrs.editorial.length <= 5) {
+            errors['editorial'] = 'Editorial review needs to have at least 5 characters.';
+          }
+
+          return errors;
+        }
+      });
+
+      var View = Backbone.View.extend({
+        el: 'body',
+
+        events: {
+          'submit form': 'submit'
+        },
+
+        initialize: function () {
+          // Set DOM elements
+          this.$title = this.$('#title');
+          this.$appLink = this.$('#appLink');
+          this.$category = this.$('#category');
+          this.$editorial = this.$('#editorial');
+
+          this.render();
+        },
+
+        render: function () {
+          return this;
+        },
+
+        submit: function (e) {
+          e.preventDefault();
+
+          var _this = this;
+
+          this.model.set({
+            title: this.$title.val(),
+            appLink: this.$appLink.val(),
+            category: this.$category.val(),
+            editorial: this.$editorial.val()
+          });
+
+          console.log('Game', this.model.toJSON());
+
+          // Validate the model
+          if (!this.model.isValid()) {
+            var errors = this.model.validationError;
+            _.each(errors, function (message, key) {
+              _this.$('#error-' + key).text(message);
+              _this.$('#' + key)
+                .parent('.form-group')
+                .addClass('has-error');
+            });
+          }
+
+          // Sync model to your backend server
+          this.model.save();
+        }
+      });
+
+      var game = new Game();
+      new View({model: game});
+
+    });
+    </script>
+  </body>
+</html>
