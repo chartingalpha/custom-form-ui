@@ -113,6 +113,11 @@
             editorial: this.$editorial.val()
           });
 
+          // Clear all previous errors and
+          // formatting
+          $('.helper-block-error').text('');
+          $('.form-group').removeClass('has-error');
+
           // Validate the model
           if (!this.model.isValid()) {
             var errors = this.model.validationError;
