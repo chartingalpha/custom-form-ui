@@ -113,8 +113,6 @@
             editorial: this.$editorial.val()
           });
 
-          console.log('Game', this.model.toJSON());
-
           // Validate the model
           if (!this.model.isValid()) {
             var errors = this.model.validationError;
